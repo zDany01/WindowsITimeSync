@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUI));
             this.SyncBtn = new System.Windows.Forms.Button();
             this.StartupCbx = new System.Windows.Forms.CheckBox();
             this.notifyManager = new System.Windows.Forms.NotifyIcon(this.components);
@@ -67,6 +68,7 @@
             this.Controls.Add(this.StartupCbx);
             this.Controls.Add(this.SyncBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "GUI";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Windows Internet Time Sync";
