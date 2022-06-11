@@ -17,12 +17,51 @@ namespace WindowsITimeSync
     {
         readonly static string applicationDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}\\WindowsITimeSync\\";
         readonly static string executablePath = applicationDirectory + Path.GetFileName(Application.ExecutablePath);
+        readonly RegistryKey currentUserRun = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
+        const string APP_NAME = "Windows Internet Time Sync";
 
         public bool isInstalled
         {
             get
             {
                 return File.Exists(executablePath);
+            }
+        }
+
+
+        private void Uninstall(bool useShellDelete)
+        {
+            try
+            {
+                currentUserRun.DeleteValue("TimeSync");
+                File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + APP_NAME + ".url");
+                if (useShellDelete)
+                {
+                    Process.Start(HiddenProgram("cmd.exe", "/c timeout 3 & rmdir \"" + applicationDirectory + "\" /s /q"));
+                    Close();
+                }
+                else Directory.Delete(applicationDirectory, true);
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Debug.WriteLine("Exception when trying to uninstall the app: " + ex.Message);
+#endif
+            }
+
+        }
+
+
+        private void appShortcutToDesktop(string linkName) //I didn't think it was that hard to create a shortcut, i don't like to rely on WSHELL
+        //https://stackoverflow.com/questions/234231/creating-application-shortcut-in-a-directory 
+        {
+            using (StreamWriter writer = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + linkName + ".url"))
+            {
+                writer.WriteLine("[InternetShortcut]");
+                writer.WriteLine("URL=file:///" + executablePath);
+                writer.WriteLine("IconIndex=0");
+                writer.WriteLine("IconFile=" + executablePath.Replace('\\', '/'));
+                writer.Flush();
             }
         }
 
@@ -48,10 +87,11 @@ namespace WindowsITimeSync
 
                 Process.Start(HiddenProgram("w32tm", "/resync")).WaitForExit();
 
-                notifyManager.ShowBalloonTip(500, "Windows Internet Time Sync", "Time successfully synchronized", ToolTipIcon.Info);
-            } catch
+                notifyManager.ShowBalloonTip(500, APP_NAME, "Time successfully synchronized", ToolTipIcon.Info);
+            }
+            catch
             {
-                notifyManager.ShowBalloonTip(500, "Windows Internet Time Sync", "Unable to synchronize your local time.\nCheck your Internet connection!", ToolTipIcon.Error);
+                notifyManager.ShowBalloonTip(500, APP_NAME, "Unable to synchronize your local time.\nCheck your Internet connection!", ToolTipIcon.Error);
             }
             this.Enabled = true;
         }
@@ -72,8 +112,6 @@ namespace WindowsITimeSync
 
         private void StartupCbx_CheckedChanged(object sender, EventArgs e)
         {
-            RegistryKey currentUserRun = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
-
             if (Application.ExecutablePath != executablePath)
             {
                 if (StartupCbx.Checked)
@@ -82,26 +120,21 @@ namespace WindowsITimeSync
                     Directory.CreateDirectory(applicationDirectory);
                     File.Copy(Application.ExecutablePath, executablePath, true);
                     currentUserRun.SetValue("TimeSync", $"\"{executablePath}\" --sync");
+                    appShortcutToDesktop(APP_NAME);
                 }
-                else
-                {
-                    Directory.Delete(applicationDirectory, true);
-                    currentUserRun.DeleteValue("TimeSync");
-                }
+                else Uninstall(false);
             }
             else
             {
-                if (!StartupCbx.Checked)
-                {
-                    throw new NotImplementedException("Uninstall from program folder");
-                }
+                if (!StartupCbx.Checked && MessageBox.Show("This will uninstall the application\nDo you want to continue?", APP_NAME, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) Uninstall(true);
+                else StartupCbx.Checked = true;
             }
 
         }
 
         private void SyncBtn_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Your current system time will be synchronized using your local timezone settings\nDo you want to continue?", "Windows Internet Time Sync", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) SyncTime();
+            if (MessageBox.Show("Your current system time will be synchronized using your local timezone settings\nDo you want to continue?", APP_NAME, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) SyncTime();
         }
     }
 }
