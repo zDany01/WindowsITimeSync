@@ -1,32 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace WindowsITimeSync
 {
     public partial class GUI : Form
     {
-        readonly static string applicationDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}\\WindowsITimeSync\\";
-        readonly static string executablePath = applicationDirectory + Path.GetFileName(Application.ExecutablePath);
-        readonly RegistryKey currentUserRun = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
-        const string APP_NAME = "Windows Internet Time Sync";
+        private static readonly string applicationDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}\\WindowsITimeSync\\";
+        private static readonly string executablePath = applicationDirectory + Path.GetFileName(Application.ExecutablePath);
+        private readonly RegistryKey currentUserRun = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
+        private const string APP_NAME = "Windows Internet Time Sync";
 
-        public bool isInstalled
-        {
-            get
-            {
-                return File.Exists(executablePath);
-            }
-        }
+        public bool isInstalled => File.Exists(executablePath);
 
 
         private void Uninstall(bool useShellDelete)
@@ -65,13 +52,16 @@ namespace WindowsITimeSync
             }
         }
 
-        private ProcessStartInfo HiddenProgram(string fileName, string args) => new ProcessStartInfo
+        private ProcessStartInfo HiddenProgram(string fileName, string args)
         {
-            FileName = fileName,
-            Arguments = args,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+            return new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = args,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+        }
 
         public void SyncTime()
         {
@@ -104,7 +94,10 @@ namespace WindowsITimeSync
             this.Load += GUI_Load;
         }
 
-        private void GUI_Load(object sender, EventArgs e) => StartupCbx.Checked = isInstalled;
+        private void GUI_Load(object sender, EventArgs e)
+        {
+            StartupCbx.Checked = this.isInstalled;
+        }
 
         private void StartupCbx_CheckedChanged(object sender, EventArgs e)
         {
@@ -112,7 +105,7 @@ namespace WindowsITimeSync
             {
                 if (StartupCbx.Checked)
                 {
-                    if (isInstalled) return;
+                    if (this.isInstalled) return;
                     Directory.CreateDirectory(applicationDirectory);
                     File.Copy(Application.ExecutablePath, executablePath, true);
                     currentUserRun.SetValue("TimeSync", $"\"{executablePath}\" --sync");
