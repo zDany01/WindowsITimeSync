@@ -12,11 +12,14 @@ namespace WindowsITimeSync
         /// Punto di ingresso principale dell'applicazione.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GUI());
+            GUI ApplicationInstance = new GUI();
+            ApplicationInstance.notifyManager.Icon = ApplicationInstance.Icon;
+            if (args.Length == 1 && args[0] == "--sync") ApplicationInstance.SyncTime();
+            else Application.Run(ApplicationInstance);
         }
     }
 }

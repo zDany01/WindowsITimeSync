@@ -73,7 +73,7 @@ namespace WindowsITimeSync
             CreateNoWindow = true
         };
 
-        private void SyncTime()
+        public void SyncTime()
         {
             this.Enabled = false;
             try
@@ -104,11 +104,7 @@ namespace WindowsITimeSync
             this.Load += GUI_Load;
         }
 
-        private void GUI_Load(object sender, EventArgs e)
-        {
-            StartupCbx.Checked = isInstalled;
-            notifyManager.Icon = this.Icon;
-        }
+        private void GUI_Load(object sender, EventArgs e) => StartupCbx.Checked = isInstalled;
 
         private void StartupCbx_CheckedChanged(object sender, EventArgs e)
         {

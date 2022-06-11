@@ -79,7 +79,7 @@
 
         private System.Windows.Forms.Button SyncBtn;
         private System.Windows.Forms.CheckBox StartupCbx;
-        private System.Windows.Forms.NotifyIcon notifyManager;
+        public System.Windows.Forms.NotifyIcon notifyManager;
     }
 }
 
