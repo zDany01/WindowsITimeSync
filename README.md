@@ -51,14 +51,14 @@ So before trying this program, there is something that you can try to do to reso
 ## Installation
 You can download the latest precompiled version of the program [here](https://github.com/zDany01/WindowsITimeSync/releases/download/v1/WindowsITimeSync.exe) or you can compile the application by yourself following these instruction.
 
-1. Download Microsoft [Visual Studio](https://visualstudio.microsoft.com) Community Edition Installer
+1. Download Microsoft [Visual Studio Community](https://visualstudio.microsoft.com) Edition
 2. Check the ***.NET Desktop Developer*** box and click install
 3. Clone(or [download](https://github.com/zDany01/WindowsITimeSync/archive/refs/heads/main.zip)) this repository:
    ```sh
    git clone https://github.com/zDany01/WindowsITimeSync.git
    ```
-4. Open the project directory and run the `WindowsITimeSync.sln` file, this will fire up visual studio and automatically open the project
-5. Now you can compile or review the source code and make any modification you want within visual studio
+4. Open the project directory and run the `WindowsITimeSync.sln` file, this will fire up Visual Studio and automatically open the project
+5. Now you can compile or review the source code and make any modification you want within Visual Studio
 
 <br><br>
 
