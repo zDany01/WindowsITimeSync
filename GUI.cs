@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Microsoft.Win32.TaskScheduler;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,10 +9,11 @@ namespace WindowsITimeSync
 {
     public partial class GUI : Form
     {
+        private const string APP_NAME = "Windows Internet Time Sync";
         private static readonly string applicationDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}\\WindowsITimeSync\\";
         private static readonly string executablePath = applicationDirectory + Path.GetFileName(Application.ExecutablePath);
         private readonly RegistryKey currentUserRun = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", true);
-        private const string APP_NAME = "Windows Internet Time Sync";
+        private readonly TaskService taskService = TaskService.Instance;
 
         public bool isInstalled => File.Exists(executablePath);
 
@@ -65,7 +67,8 @@ namespace WindowsITimeSync
         {
             try
             {
-                currentUserRun.DeleteValue("TimeSync");
+                //currentUserRun.DeleteValue("TimeSync");
+                taskService.RootFolder.DeleteTask("WindowsITimeSync", false);
                 File.Delete($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\{APP_NAME}.url");
                 if (useShellDelete)
                 {
@@ -106,7 +109,19 @@ namespace WindowsITimeSync
                     if (this.isInstalled) return;
                     Directory.CreateDirectory(applicationDirectory);
                     File.Copy(Application.ExecutablePath, executablePath, true);
-                    currentUserRun.SetValue("TimeSync", $"\"{executablePath}\" --sync");
+                    TaskDefinition startupTask = taskService.NewTask();
+                    startupTask.Actions.Add($"\"{executablePath}\"", "--sync");
+                    startupTask.Principal.LogonType = TaskLogonType.InteractiveToken;
+                    startupTask.Principal.RunLevel = TaskRunLevel.Highest;
+                    startupTask.RegistrationInfo.Description = "Time sync on startup";
+                    startupTask.Settings.AllowDemandStart = true;
+                    startupTask.Settings.DisallowStartIfOnBatteries = false;
+                    startupTask.Settings.ExecutionTimeLimit = new TimeSpan(0);
+                    startupTask.Settings.RunOnlyIfNetworkAvailable = true;
+                    startupTask.Settings.StartWhenAvailable = true;
+                    startupTask.Settings.UseUnifiedSchedulingEngine = true;
+                    startupTask.Triggers.Add(new LogonTrigger());
+                    taskService.RootFolder.RegisterTaskDefinition("WindowsITimeSync", startupTask);
                     appShortcutToDesktop(APP_NAME);
                 }
                 else Uninstall(false);
