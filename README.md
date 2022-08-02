@@ -49,7 +49,7 @@ So before trying this program, there is something that you can try to do to reso
 <br><br>
 
 ## Installation
-You can download the latest precompiled version of the program [here](https://github.com/zDany01/WindowsITimeSync/releases/download/v1/WindowsITimeSync.exe) or you can compile the application by yourself following these instruction.
+You can download the latest precompiled version of the program [here](https://github.com/zDany01/WindowsITimeSync/releases/download/v1.1/WindowsITimeSync.exe) or you can compile the application by yourself following these instruction.
 
 1. Download Microsoft [Visual Studio Community](https://visualstudio.microsoft.com) Edition
 2. Check the ***.NET Desktop Developer*** box and click install
@@ -86,5 +86,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [issues-shield]: https://img.shields.io/github/issues/zDany01/WindowsITimeSync.svg?style=for-the-badge
 [issues-url]: https://github.com/zDany01/WindowsITimeSync/issues
 [license-shield]: https://img.shields.io/github/license/zDany01/WindowsITimeSync.svg?style=for-the-badge
-[license-url]: https://github.com/zDany01/WindowsITimeSync/blob/master/LICENSE.txt
+[license-url]: https://github.com/zDany01/WindowsITimeSync/blob/master/LICENSE
 [product-screenshot]: https://github.com/zDany01/zDany01/blob/main/Assets/WindowsITimeSync/TextLogo.png?raw=true
